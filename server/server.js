@@ -8,6 +8,7 @@ import QRCode from "@lespantsfancy/agency/lib/modules/qrcode/QRCode";
 import MongoDB from "mongodb";
 
 const uri = `mongodb://localhost:27017`;
+const DATABASE = `test`;
 let mongodb;
 MongoDB.MongoClient.connect(uri, { poolSize: 10, useNewUrlParser: true, useUnifiedTopology: true }, (err, db) => mongodb = db);
 
@@ -26,17 +27,8 @@ const wss = WSS.QuickSetup(expressWs(app), {
 
 const mongonet = new Agency.Event.Network({}, {
 	default: {
-		player(msg, { upsert, find }) {
-			// find(`players`, { timestamp: { $gt: 0 }}).then(a => console.log(a));
-
-			upsert(`players`, {
-				timestamp: 0,
-			}, {
-				timestamp: Date.now(),
-			});
-		},
 		$globals: {
-			mongo: (commands = [], database = "drug-wars") => {
+			mongo: (commands = [], database = DATABASE) => {
 				if(!Array.isArray(commands)) {
 					commands = [ commands ];
 				}
@@ -54,7 +46,7 @@ const mongonet = new Agency.Event.Network({}, {
 					});
 				});
 			},
-			upsert: (collection, filter, update, { isMany = false, database = "drug-wars", ...opts } = {}) => {
+			upsert: (collection, filter, update, { isMany = false, database = DATABASE, ...opts } = {}) => {
 				return new Promise((resolve) => {
 					mongodb.connect(err => {
 						const db = mongodb.db(database);
@@ -70,7 +62,7 @@ const mongonet = new Agency.Event.Network({}, {
 					});
 				});
 			},
-			find: (collection, query, { projection, database = "drug-wars" } = {}) => {
+			find: (collection, query, { projection, database = DATABASE } = {}) => {
 				return new Promise((resolve) => {
 					mongodb.connect(err => {
 						const db = mongodb.db(database);
